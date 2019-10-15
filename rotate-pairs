@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require_relative './tasks'
+
+validate_pal_tracker_clean!
+validate_pal_tracker_distributed_clean!
+
+replace_assignment_submission_emails
+first = ask_who_stays_at_workstation
+second = ask_who_is_joining_the_workstation
+fillin_emails_in_assignment_submission(first, second)
+reset_git_author
+reset_ssh_identities
+logout_of_cloud_foundry
+
+verify_assignment_submission_works
+
