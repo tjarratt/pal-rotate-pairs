@@ -2,6 +2,8 @@ HOME = ENV['HOME']
 WORKSPACE = "#{HOME}/workspace"
 
 def validate_pal_tracker_clean!
+  return unless Dir.exists? "#{WORKSPACE}/pal-tracker"
+
   Dir.chdir "#{WORKSPACE}/pal-tracker" do
     return unless uncommitted_changes?
 
@@ -19,6 +21,8 @@ def validate_pal_tracker_clean!
 end
 
 def validate_pal_tracker_distributed_clean!
+  return unless Dir.exists? "#{WORKSPACE}/pal-tracker-distributed"
+
   Dir.chdir "#{WORKSPACE}/pal-tracker-distributed" do
     return unless uncommitted_changes?
 
