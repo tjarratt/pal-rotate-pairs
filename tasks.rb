@@ -3,7 +3,8 @@ WORKSPACE = "#{HOME}/workspace"
 
 def validate_pal_tracker_clean!
   Dir.chdir "#{WORKSPACE}/pal-tracker" do
-    `git diff-index --quiet HEAD --`
+    return unless uncommitted_changes?
+
     puts 'Wait a minute, not just yet ...'
     puts ''
 
@@ -11,14 +12,32 @@ def validate_pal_tracker_clean!
     puts ''
 
     puts 'Resolution:'
-    puts 'Go the the pal-tracker directory, ensure your changes are committed and pushed. Then re-run this script'
+    puts 'Go the the pal-tracker directory, ensure your changes are committed and pushed. Then re-run this script.'
 
     exit 1
   end
 end
 
 def validate_pal_tracker_distributed_clean!
+  Dir.chdir "#{WORKSPACE}/pal-tracker-distributed" do
+    return unless uncommitted_changes?
 
+    puts 'Wait a minute, not just yet ...'
+    puts ''
+
+    puts 'Refusing to rotate pairs while there are uncommited changes to pal-tracker-distributed.'
+    puts ''
+
+    puts 'Resolution:'
+    puts 'Go to the pal-tracker-distributed directory, ensure your changes are committed and pushed. Then re-run this script.'
+
+    exit 1
+  end
+end
+
+def uncommitted_changes?
+  `git diff-index --quiet HEAD --`
+  return $? != 0
 end
 
 def ask_who_stays_at_workstation
