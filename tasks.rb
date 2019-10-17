@@ -71,3 +71,9 @@ end
 def verify_assignment_submission_works
 
 end
+
+def success!
+  puts "Great, you've rotated pairs."
+  puts "Now get to work on the next lab ;-)"
+end
+
