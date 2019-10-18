@@ -44,6 +44,11 @@ def uncommitted_changes?
   return $? != 0
 end
 
+def unpushed_commits?
+  `git diff master origin/master --exit-code`
+  return $? != 0
+end
+
 def ask_who_stays_at_workstation
 
 end
