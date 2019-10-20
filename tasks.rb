@@ -5,18 +5,8 @@ def validate_pal_tracker_clean!
   return unless Dir.exists? "#{WORKSPACE}/pal-tracker"
 
   Dir.chdir "#{WORKSPACE}/pal-tracker" do
-    return unless uncommitted_changes?
-
-    puts 'Wait a minute, not just yet ...'
-    puts ''
-
-    puts 'Refusing to rotate pairs while there are uncommitted changes to pal-tracker.'
-    puts ''
-
-    puts 'Resolution:'
-    puts 'Go the the pal-tracker directory, ensure your changes are committed and pushed. Then re-run this script.'
-
-    exit 1
+    Dirty.new('pal-tracker').halt if uncommitted_changes?
+    Unpushed.new('pal-tracker').halt if unpushed_commits?
   end
 end
 
@@ -24,18 +14,8 @@ def validate_pal_tracker_distributed_clean!
   return unless Dir.exists? "#{WORKSPACE}/pal-tracker-distributed"
 
   Dir.chdir "#{WORKSPACE}/pal-tracker-distributed" do
-    return unless uncommitted_changes?
-
-    puts 'Wait a minute, not just yet ...'
-    puts ''
-
-    puts 'Refusing to rotate pairs while there are uncommited changes to pal-tracker-distributed.'
-    puts ''
-
-    puts 'Resolution:'
-    puts 'Go to the pal-tracker-distributed directory, ensure your changes are committed and pushed. Then re-run this script.'
-
-    exit 1
+    Dirty.new('pal-tracker-distributed').halt if uncommitted_changes?
+    Unpushed.new('pal-tracker-distributed').halt if unpushed_commits?
   end
 end
 
@@ -81,4 +61,45 @@ def success!
   puts "Great, you've rotated pairs."
   puts "Now get to work on the next lab ;-)"
 end
+
+class Exceptionish
+   def initialize(repo_name)
+    @repo_name = repo_name
+  end
+
+  def halt
+    puts 'Wait a minute, not just yet ...'
+    puts ''
+
+    puts reason_for_exit
+    puts ''
+
+    puts 'Resolution:'
+    puts resolution
+
+    exit 1
+
+  end
+end
+
+class Dirty < Exceptionish
+ def reason_for_exit
+    "Refusing to rotate pairs while there are uncommitted changes to #{@repo_name}."
+  end
+
+  def resolution
+    "Go the the #{@repo_name} directory, ensure your changes are committed and pushed. Then re-run this script."
+  end
+end
+
+class Unpushed < Exceptionish
+  def reason_for_exit
+    "Refusing to rotate pairs while there are unpushed changes to #{@repo_name}."
+  end
+
+  def resolution
+    "Go the the #{@repo_name} directory, ensure your changes are and pushed to origin/master. Then re-run this script."
+  end
+end
+
 
