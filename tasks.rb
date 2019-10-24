@@ -29,7 +29,7 @@ def unpushed_commits?
   return $? != 0
 end
 
-def ask_who_stays_at_workstation
+def ask_who_has_left_the_workstation
   emails = read_emails_from_build_dot_gradle
 
   puts "Who is staying at the workstation ? Please type '1' or '2'"
@@ -40,10 +40,19 @@ def ask_who_stays_at_workstation
   input = gets.strip
   puts ''
 
-  stays = case input when '1'; emails.first else emails.second end
-  puts "Okay, great then #{stays} will stay at the workstation"
+  stays, goes = case input
+    when '1'
+      [emails.first, emails.second]
+    when '2'
+      [emails.second, emails.first]
+    else
+      BadInput(input).halt
+  end
 
-  return stays
+  puts "Okay, great then #{stays} will stay at the workstation"
+  puts ''
+
+  return goes
 end
 
 def read_emails_from_build_dot_gradle
@@ -62,7 +71,7 @@ def read_emails_from_build_dot_gradle
 end
 
 def ask_who_is_joining_the_workstation
-  puts "... and what is the email address for the person who will be joining the workstation ?"
+  puts "Please enter the email address of the person who will be joining the workstation."
 
   new_email = gets.strip
   puts ''
@@ -70,8 +79,12 @@ def ask_who_is_joining_the_workstation
   return new_email
 end
 
-def fill_in_emails_in_assignment_submission(driver, navigator)
-
+def replace_email_in_assignment_submission(old_email, new_email)
+  Dir.chdir("#{WORKSPACE}/assignment-submission") do
+    contents = File.read("build.gradle")
+    contents.gsub!(old_email, new_email)
+    File.write("build.gradle", contents)
+  end
 end
 
 def reset_git_author
@@ -111,6 +124,21 @@ class Exceptionish
     puts resolution
 
     exit 1
+  end
+end
+
+class BadInput < Exceptionish
+  def initialize(input, valid_input)
+    @input = input
+    @valid_input = valid_input
+  end
+
+  def reason_for_exit
+    "Unknown input '#{@input}'. Expected one of (#{valid_input})"
+  end
+
+  def resolution
+    "... don't do that again ? please ?"
   end
 end
 

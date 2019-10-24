@@ -4,9 +4,9 @@ require_relative './tasks'
 validate_pal_tracker_clean!
 validate_pal_tracker_distributed_clean!
 
-first = ask_who_stays_at_workstation
-second = ask_who_is_joining_the_workstation
-fill_in_emails_in_assignment_submission(first, second)
+rotated_out = ask_who_has_left_the_workstation
+rotated_in = ask_who_is_joining_the_workstation
+replace_email_in_assignment_submission(rotated_out, rotated_in)
 reset_git_author
 reset_ssh_identities
 logout_of_cloud_foundry
